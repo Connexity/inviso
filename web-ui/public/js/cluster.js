@@ -215,7 +215,7 @@ function scrollSearch(type, cluster, includes, start, stop, callback) {
 function loadAppData(cluster, start, stop, includes) {
   start = Math.floor(start || (Date.now() - settings.cluster.applicationLookback));
   stop = Math.ceil(stop || Date.now());
-  includes = ['timestamp', 'id', 'cluster', 'cluster.id', 'queue', 'user', 'startedTime', 'runningContainers', 'allocatedVCores', 'allocatedMB'];
+  includes = ['timestamp', 'id', 'name', 'cluster', 'cluster.id', 'queue', 'user', 'startedTime', 'runningContainers', 'allocatedVCores', 'allocatedMB'];
 
   scrollSearch('applications', cluster, includes, start, stop, function(data){
     var periods = _.uniq(_.map(data, function(d) {return d.timestamp;})).sort();
@@ -232,12 +232,13 @@ function loadAppData(cluster, start, stop, includes) {
           app.sort(function(a,b){return a.timestamp - b.timestamp;});
 
           var id = app[0].id;
+          var name = app[0].name;
           var user = app[0].user;
           var queue = app[0].queue;
 
           _.each(periods, function(p,i) {
             if(app.length <= i || app[i].timestamp > p) {
-              app.splice(i,0,{x:p, y:0, id:id, user: user, queue: queue});
+              app.splice(i,0,{x:p, y:0, id:id, name:name, user: user, queue: queue});
             } else {
               app[i].x = p;
               app[i].y = app[i][$('#metric').val()];
